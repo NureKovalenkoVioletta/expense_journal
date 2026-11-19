@@ -1,5 +1,11 @@
-import 'package:expense_journal/expense_journal.dart' as expense_journal;
+import 'package:expense_journal/expense_data.dart';
+import 'package:expense_journal/expense_journal.dart';
 
-void main(List<String> arguments) {
-  print('Hello world: ${expense_journal.calculate()}!');
+void main() {
+  final rejected = rawExpenses.where((line) => parseLine(line) == null);
+  final parsedCount = rawExpenses.length - rejected.length;
+
+  print('Розібрано записів: $parsedCount з ${rawExpenses.length}');
+  print('Пошкоджені рядки:');
+  rejected.forEach(print);
 }
