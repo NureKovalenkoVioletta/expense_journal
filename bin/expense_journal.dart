@@ -1,11 +1,28 @@
 import 'package:expense_journal/expense_data.dart';
 import 'package:expense_journal/expense_journal.dart';
 
+const String _sectionLine = '----------------------------------------';
+
+void _printSection(String title) {
+  print('');
+  print(title);
+  print(_sectionLine);
+}
+
 void main() {
   final rejected = rawExpenses.where((line) => parseLine(line) == null);
   final parsedCount = rawExpenses.length - rejected.length;
 
+  _printSection('Розбір рядків');
   print('Розібрано записів: $parsedCount з ${rawExpenses.length}');
   print('Пошкоджені рядки:');
   rejected.forEach(print);
+
+  _printSection('Валідація записів');
+  for (final expense in rawExpenses.map(parseLine).nonNulls) {
+    final violations = validateExpense(expense);
+    if (violations.isNotEmpty) {
+      print('${expense.note}: ${violations.join(', ')}');
+    }
+  }
 }
