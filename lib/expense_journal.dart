@@ -101,3 +101,20 @@ List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
     average: total / expenses.length,
   );
 }
+
+/// Групує витрати [expenses] за категорією
+Map<String, List<Expense>> groupByCategory(Iterable<Expense> expenses) =>
+    expenses.fold(
+      {},
+      (groups, expense) =>
+          groups..putIfAbsent(expense.category, () => []).add(expense),
+    );
+
+/// Обчислює загальну суму в гривнях для кожної групи витрат [groups]
+Map<String, double> totalByGroupUah(Map<String, List<Expense>> groups) =>
+    groups.map(
+      (key, items) => MapEntry(
+        key,
+        items.map(amountInUah).fold(0, (sum, amount) => sum + amount),
+      ),
+    );

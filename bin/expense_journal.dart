@@ -46,4 +46,11 @@ void main() {
     'максимум: ${stats.max.toStringAsFixed(amountFractionDigits)} UAH, '
     'середнє: ${stats.average.toStringAsFixed(amountFractionDigits)} UAH',
   );
+
+  _printSection('Групування за категоріями');
+  final totals = totalByGroupUah(groupByCategory(expenses));
+  totals.forEach(
+    (category, total) =>
+        print('$category: ${total.toStringAsFixed(amountFractionDigits)} UAH'),
+  );
 }
