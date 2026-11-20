@@ -64,4 +64,17 @@ void main() {
   ).take(_previewCount).map(formatExpense).forEach(print);
   print('Найраніші за датою:');
   sortByDate(expenses).take(_previewCount).map(formatExpense).forEach(print);
+
+  _printSection('Звіт');
+  print(buildReport(expenses));
+  print('');
+  print(
+    buildReport(
+      expenses,
+      title: 'Найменші витрати',
+      topCount: _previewCount,
+      descending: false,
+      separator: '; ',
+    ),
+  );
 }

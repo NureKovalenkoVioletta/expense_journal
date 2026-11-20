@@ -139,3 +139,37 @@ List<Expense> sortByDate(
   ..sort(
     (a, b) => descending ? b.date.compareTo(a.date) : a.date.compareTo(b.date),
   );
+
+/// Заголовок звіту за замовчуванням
+const String defaultReportTitle = 'Звіт про витрати';
+
+/// Кількість записів у звіті за замовчуванням
+const int defaultReportTopCount = 5;
+
+/// Роздільник колонок звіту за замовчуванням
+const String defaultReportSeparator = ' | ';
+
+/// Формує текстовий звіт із перших [topCount] витрат [expenses], упорядкованих за сумою
+String buildReport(
+  List<Expense> expenses, {
+  String title = defaultReportTitle,
+  int topCount = defaultReportTopCount,
+  bool descending = true,
+  String separator = defaultReportSeparator,
+}) {
+  final rows = sortByAmount(expenses, descending: descending)
+      .take(topCount)
+      .map(
+        (expense) => [
+          expense.date.toIso8601String().split('T').first,
+          expense.category,
+          '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH',
+          expense.note,
+        ].join(separator),
+      );
+  final buffer = StringBuffer()
+    ..writeln(title)
+    ..writeln('Показано ${rows.length} з ${expenses.length}')
+    ..writeAll(rows, '\n');
+  return buffer.toString();
+}
