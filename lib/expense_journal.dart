@@ -78,15 +78,16 @@ double totalCardSpendingUah(Iterable<Expense> expenses) => expenses
     .map(amountInUah)
     .fold(0, (sum, amount) => sum + amount);
 
+/// Повертає короткий текстовий опис витрати [expense] із сумою в гривнях
+String formatExpense(Expense expense) =>
+    '${expense.date.toIso8601String().split('T').first} '
+    '${expense.category}: '
+    '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH';
+
 /// Формує текстові описи витрат, сума яких не менша за поріг великої витрати
 List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
     .where((expense) => amountInUah(expense) >= largeExpenseThresholdUah)
-    .map(
-      (expense) =>
-          '${expense.date.toIso8601String().split('T').first} '
-          '${expense.category}: '
-          '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH',
-    )
+    .map(formatExpense)
     .toList();
 
 /// Обчислює мінімальну, максимальну та середню суму витрат у гривнях
@@ -118,3 +119,23 @@ Map<String, double> totalByGroupUah(Map<String, List<Expense>> groups) =>
         items.map(amountInUah).fold(0, (sum, amount) => sum + amount),
       ),
     );
+
+/// Повертає копію [expenses], відсортовану за сумою в гривнях
+List<Expense> sortByAmount(
+  Iterable<Expense> expenses, {
+  bool descending = false,
+}) => expenses.toList()
+  ..sort(
+    (a, b) => descending
+        ? amountInUah(b).compareTo(amountInUah(a))
+        : amountInUah(a).compareTo(amountInUah(b)),
+  );
+
+/// Повертає копію [expenses], відсортовану за датою
+List<Expense> sortByDate(
+  Iterable<Expense> expenses, {
+  bool descending = false,
+}) => expenses.toList()
+  ..sort(
+    (a, b) => descending ? b.date.compareTo(a.date) : a.date.compareTo(b.date),
+  );

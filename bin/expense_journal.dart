@@ -3,6 +3,8 @@ import 'package:expense_journal/expense_journal.dart';
 
 const String _sectionLine = '----------------------------------------';
 
+const int _previewCount = 3;
+
 void _printSection(String title) {
   print('');
   print(title);
@@ -53,4 +55,13 @@ void main() {
     (category, total) =>
         print('$category: ${total.toStringAsFixed(amountFractionDigits)} UAH'),
   );
+
+  _printSection('Сортування');
+  print('Найбільші за сумою:');
+  sortByAmount(
+    expenses,
+    descending: true,
+  ).take(_previewCount).map(formatExpense).forEach(print);
+  print('Найраніші за датою:');
+  sortByDate(expenses).take(_previewCount).map(formatExpense).forEach(print);
 }
