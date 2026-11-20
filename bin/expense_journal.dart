@@ -25,4 +25,25 @@ void main() {
       print('${expense.note}: ${violations.join(', ')}');
     }
   }
+
+  final expenses = rawExpenses
+      .map(parseLine)
+      .nonNulls
+      .where((expense) => validateExpense(expense).isEmpty)
+      .toList();
+
+  _printSection('Конвеєри обробки');
+  print('Коректних записів: ${expenses.length}');
+  print(
+    'Оплачено карткою: '
+    '${totalCardSpendingUah(expenses).toStringAsFixed(amountFractionDigits)} UAH',
+  );
+  print('Великі витрати (від $largeExpenseThresholdUah UAH):');
+  describeLargeExpenses(expenses).forEach(print);
+  final stats = amountStatsUah(expenses);
+  print(
+    'Мінімум: ${stats.min.toStringAsFixed(amountFractionDigits)} UAH, '
+    'максимум: ${stats.max.toStringAsFixed(amountFractionDigits)} UAH, '
+    'середнє: ${stats.average.toStringAsFixed(amountFractionDigits)} UAH',
+  );
 }

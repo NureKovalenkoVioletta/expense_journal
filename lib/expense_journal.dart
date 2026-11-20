@@ -47,3 +47,57 @@ List<String> validateExpense(Expense expense) => [
     'непідтримувана валюта ${expense.currency}',
   if (expense.category.isEmpty) 'порожня категорія',
 ];
+
+/// Курс гривні до долара США для перерахунку сум
+const double uahPerUsd = 45.05;
+
+/// Курс гривні до євро для перерахунку сум
+const double uahPerEur = 49.53;
+
+/// Префікс способу оплати карткою
+const String cardPrefix = 'card:';
+
+/// Поріг суми в гривнях, від якого витрата вважається великою
+const int largeExpenseThresholdUah = 500;
+
+/// Кількість знаків після коми у виведених сумах
+const int amountFractionDigits = 2;
+
+/// Повертає суму витрати [expense], перераховану в гривні
+double amountInUah(Expense expense) =>
+    expense.amount *
+    switch (expense.currency) {
+      'USD' => uahPerUsd,
+      'EUR' => uahPerEur,
+      _ => 1,
+    };
+
+/// Повертає загальну суму в гривнях за витратами, оплаченими карткою
+double totalCardSpendingUah(Iterable<Expense> expenses) => expenses
+    .where((expense) => expense.payment.startsWith(cardPrefix))
+    .map(amountInUah)
+    .fold(0, (sum, amount) => sum + amount);
+
+/// Формує текстові описи витрат, сума яких не менша за поріг великої витрати
+List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
+    .where((expense) => amountInUah(expense) >= largeExpenseThresholdUah)
+    .map(
+      (expense) =>
+          '${expense.date.toIso8601String().split('T').first} '
+          '${expense.category}: '
+          '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH',
+    )
+    .toList();
+
+/// Обчислює мінімальну, максимальну та середню суму витрат у гривнях
+({double min, double max, double average}) amountStatsUah(
+  List<Expense> expenses,
+) {
+  final amounts = expenses.map(amountInUah);
+  final total = amounts.fold<double>(0, (sum, amount) => sum + amount);
+  return (
+    min: amounts.reduce((a, b) => a < b ? a : b),
+    max: amounts.reduce((a, b) => a > b ? a : b),
+    average: total / expenses.length,
+  );
+}
