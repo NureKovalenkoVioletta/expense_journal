@@ -94,4 +94,11 @@ void main() {
       '${found == null ? 'не знайдено' : formatExpense(found)}',
     );
   }
+
+  _printSection('Маскування номерів карток');
+  expenses
+      .map((expense) => expense.payment)
+      .toSet()
+      .map((payment) => '$payment -> ${maskPayment(payment)}')
+      .forEach(print);
 }
