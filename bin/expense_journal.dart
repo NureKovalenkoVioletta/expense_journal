@@ -5,6 +5,12 @@ const String _sectionLine = '----------------------------------------';
 
 const int _previewCount = 3;
 
+const String _foodCategory = 'Продукти';
+
+const String _pharmacyCategory = 'Аптека';
+
+const String _travelCategory = 'Подорожі';
+
 void _printSection(String title) {
   print('');
   print(title);
@@ -77,4 +83,15 @@ void main() {
       separator: '; ',
     ),
   );
+
+  _printSection('Замикання та пошук');
+  final isFood = isInCategory(_foodCategory);
+  print('Записів у категорії $_foodCategory: ${expenses.where(isFood).length}');
+  for (final category in [_pharmacyCategory, _travelCategory]) {
+    final found = expenses.where(isInCategory(category)).firstOrNull;
+    print(
+      'Перший запис у категорії $category: '
+      '${found == null ? 'не знайдено' : formatExpense(found)}',
+    );
+  }
 }

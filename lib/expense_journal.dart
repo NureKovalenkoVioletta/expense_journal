@@ -173,3 +173,7 @@ String buildReport(
     ..writeAll(rows, '\n');
   return buffer.toString();
 }
+
+/// Повертає предикат, що перевіряє належність витрати до категорії [category]
+bool Function(Expense) isInCategory(String category) =>
+    (expense) => expense.category == category;
