@@ -101,4 +101,15 @@ void main() {
       .toSet()
       .map((payment) => '$payment -> ${maskPayment(payment)}')
       .forEach(print);
+
+  _printSection('Вік записів');
+  final byDate = sortByDate(expenses);
+  print(
+    'Найстаріший: ${formatExpense(byDate.first)}, '
+    '${ageInDays(byDate.first)} дн.',
+  );
+  print(
+    'Найновіший: ${formatExpense(byDate.last)}, '
+    '${ageInDays(byDate.last)} дн.',
+  );
 }

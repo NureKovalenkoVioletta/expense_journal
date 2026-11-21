@@ -196,3 +196,6 @@ String buildReport(
 /// Повертає предикат, що перевіряє належність витрати до категорії [category]
 bool Function(Expense) isInCategory(String category) =>
     (expense) => expense.category == category;
+
+/// Повертає вік витрати [expense] у днях відносно [referenceDate]
+int ageInDays(Expense expense) => referenceDate.difference(expense.date).inDays;
