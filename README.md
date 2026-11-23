@@ -54,3 +54,10 @@ dart analyze
 - перерахунок у гривні виконано виразом `switch` за кодом валюти, а не пошуком у `Map`, який повертає nullable-значення й вимагав би `!`;
 - в обробнику `replaceAllMapped` тип `Match` звужується до `RegExpMatch` перевіркою `is`, без приведення `as`;
 - результати `tryParse` перевіряються на `null`, після чого тип звужується автоматично.
+
+## Вивід `dart analyze`
+
+```
+Analyzing expense_journal...
+No issues found!
+```
