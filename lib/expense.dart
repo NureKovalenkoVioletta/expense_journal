@@ -1,3 +1,5 @@
+import 'payment.dart';
+
 /// Дата, відносно якої визначаються вік запису та майбутні дати
 final DateTime referenceDate = DateTime(2026, 11, 1);
 
@@ -6,9 +8,6 @@ const double uahPerUsd = 45.05;
 
 /// Курс гривні до євро для перерахунку сум
 const double uahPerEur = 49.53;
-
-/// Префікс способу оплати карткою
-const String cardPrefix = 'card:';
 
 /// Кількість знаків після коми у виведених сумах
 const int amountFractionDigits = 2;
@@ -33,7 +32,7 @@ class const Expense({
   /// Код валюти
   required final String currency,
 
-  /// Спосіб оплати: `cash` або `card:` з номером картки
+  /// Спосіб оплати: `cash`, `card:` з номером картки або `transfer:` з IBAN
   required final String payment,
 
   /// Довільна примітка
@@ -81,8 +80,11 @@ class const Expense({
   /// Вік витрати в днях відносно [referenceDate]
   int get ageInDays => referenceDate.difference(date).inDays;
 
+  /// Розпізнаний спосіб оплати або `null`, якщо формат невідомий
+  Payment? get paymentMethod => Payment.tryParse(payment);
+
   /// Чи оплачено витрату карткою
-  bool get isCardPayment => payment.startsWith(cardPrefix);
+  bool get isCardPayment => paymentMethod is CardPayment;
 
   @override
   bool operator ==(Object other) =>

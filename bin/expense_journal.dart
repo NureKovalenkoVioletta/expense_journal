@@ -92,11 +92,14 @@ void main() {
     );
   }
 
-  _printSection('Маскування номерів карток');
+  _printSection('Маскування способів оплати');
   expenses
       .map((expense) => expense.payment)
       .toSet()
-      .map((payment) => '$payment -> ${maskPayment(payment)}')
+      .map(
+        (payment) =>
+            '$payment -> ${Payment.tryParse(payment)?.masked ?? payment}',
+      )
       .forEach(print);
 
   _printSection('Конструктори');

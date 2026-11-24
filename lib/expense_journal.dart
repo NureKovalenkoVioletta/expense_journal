@@ -1,17 +1,10 @@
 import 'expense.dart';
 
 export 'expense.dart';
+export 'payment.dart';
 
 /// Валюти, які підтримує журнал
 const Set<String> supportedCurrencies = {'UAH', 'USD', 'EUR'};
-
-/// Спосіб оплати готівкою
-const String cashPayment = 'cash';
-
-/// Шаблон оплати карткою: префікс `card:` і 16 цифр номера
-final RegExp cardPaymentPattern = RegExp(
-  r'^card:(?<hidden>\d{12})(?<visible>\d{4})$',
-);
 
 /// Перевіряє значення [expense] і повертає перелік виявлених порушень
 List<String> validateExpense(Expense expense) => [
@@ -20,18 +13,9 @@ List<String> validateExpense(Expense expense) => [
   if (!supportedCurrencies.contains(expense.currency))
     'непідтримувана валюта ${expense.currency}',
   if (expense.category.isEmpty) 'порожня категорія',
-  if (expense.payment != cashPayment &&
-      !cardPaymentPattern.hasMatch(expense.payment))
+  if (expense.paymentMethod == null)
     'некоректний спосіб оплати ${expense.payment}',
 ];
-
-/// Маскує номер картки у способі оплати [payment], залишаючи останні чотири цифри
-String maskPayment(String payment) => payment.replaceAllMapped(
-  cardPaymentPattern,
-  (match) => match is RegExpMatch
-      ? '**** **** **** ${match.namedGroup('visible')}'
-      : payment,
-);
 
 /// Поріг суми в гривнях, від якого витрата вважається великою
 const int largeExpenseThresholdUah = 500;
