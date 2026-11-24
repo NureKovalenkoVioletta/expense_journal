@@ -1,18 +1,12 @@
+import 'expense.dart';
+
+export 'expense.dart';
+
 /// Роздільник полів у вхідному рядку
 const String fieldSeparator = ';';
 
 /// Кількість полів у коректному рядку
 const int expenseFieldCount = 6;
-
-/// Запис про одну витрату
-typedef Expense = ({
-  DateTime date,
-  String category,
-  double amount,
-  String currency,
-  String payment,
-  String note,
-});
 
 /// Розбирає рядок [line] у запис витрати або повертає `null`, якщо формат некоректний
 Expense? parseLine(String line) {
@@ -23,7 +17,7 @@ Expense? parseLine(String line) {
   final amount = double.tryParse(parts[2]);
   if (date == null || amount == null) return null;
 
-  return (
+  return Expense(
     date: date,
     category: parts[1],
     amount: amount,
@@ -32,9 +26,6 @@ Expense? parseLine(String line) {
     note: parts[5],
   );
 }
-
-/// Дата, відносно якої визначається, чи запис не з майбутнього
-final DateTime referenceDate = DateTime(2026, 11, 1);
 
 /// Валюти, які підтримує журнал
 const Set<String> supportedCurrencies = {'UAH', 'USD', 'EUR'};
@@ -67,53 +58,26 @@ String maskPayment(String payment) => payment.replaceAllMapped(
       : payment,
 );
 
-/// Курс гривні до долара США для перерахунку сум
-const double uahPerUsd = 45.05;
-
-/// Курс гривні до євро для перерахунку сум
-const double uahPerEur = 49.53;
-
-/// Префікс способу оплати карткою
-const String cardPrefix = 'card:';
-
 /// Поріг суми в гривнях, від якого витрата вважається великою
 const int largeExpenseThresholdUah = 500;
 
-/// Кількість знаків після коми у виведених сумах
-const int amountFractionDigits = 2;
-
-/// Повертає суму витрати [expense], перераховану в гривні
-double amountInUah(Expense expense) =>
-    expense.amount *
-    switch (expense.currency) {
-      'USD' => uahPerUsd,
-      'EUR' => uahPerEur,
-      _ => 1,
-    };
-
 /// Повертає загальну суму в гривнях за витратами, оплаченими карткою
 double totalCardSpendingUah(Iterable<Expense> expenses) => expenses
-    .where((expense) => expense.payment.startsWith(cardPrefix))
-    .map(amountInUah)
+    .where((expense) => expense.isCardPayment)
+    .map((expense) => expense.amountInUah)
     .fold(0, (sum, amount) => sum + amount);
-
-/// Повертає короткий текстовий опис витрати [expense] із сумою в гривнях
-String formatExpense(Expense expense) =>
-    '${expense.date.toIso8601String().split('T').first} '
-    '${expense.category}: '
-    '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH';
 
 /// Формує текстові описи витрат, сума яких не менша за поріг великої витрати
 List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
-    .where((expense) => amountInUah(expense) >= largeExpenseThresholdUah)
-    .map(formatExpense)
+    .where((expense) => expense.amountInUah >= largeExpenseThresholdUah)
+    .map((expense) => '$expense')
     .toList();
 
 /// Обчислює мінімальну, максимальну та середню суму витрат у гривнях
 ({double min, double max, double average}) amountStatsUah(
   List<Expense> expenses,
 ) {
-  final amounts = expenses.map(amountInUah);
+  final amounts = expenses.map((expense) => expense.amountInUah);
   final total = amounts.fold<double>(0, (sum, amount) => sum + amount);
   return (
     min: amounts.reduce((a, b) => a < b ? a : b),
@@ -135,7 +99,9 @@ Map<String, double> totalByGroupUah(Map<String, List<Expense>> groups) =>
     groups.map(
       (key, items) => MapEntry(
         key,
-        items.map(amountInUah).fold(0, (sum, amount) => sum + amount),
+        items
+            .map((expense) => expense.amountInUah)
+            .fold(0, (sum, amount) => sum + amount),
       ),
     );
 
@@ -146,8 +112,8 @@ List<Expense> sortByAmount(
 }) => expenses.toList()
   ..sort(
     (a, b) => descending
-        ? amountInUah(b).compareTo(amountInUah(a))
-        : amountInUah(a).compareTo(amountInUah(b)),
+        ? b.amountInUah.compareTo(a.amountInUah)
+        : a.amountInUah.compareTo(b.amountInUah),
   );
 
 /// Повертає копію [expenses], відсортовану за датою
@@ -182,7 +148,7 @@ String buildReport(
         (expense) => [
           expense.date.toIso8601String().split('T').first,
           expense.category,
-          '${amountInUah(expense).toStringAsFixed(amountFractionDigits)} UAH',
+          '${expense.amountInUah.toStringAsFixed(amountFractionDigits)} UAH',
           expense.note,
         ].join(separator),
       );
@@ -196,6 +162,3 @@ String buildReport(
 /// Повертає предикат, що перевіряє належність витрати до категорії [category]
 bool Function(Expense) isInCategory(String category) =>
     (expense) => expense.category == category;
-
-/// Повертає вік витрати [expense] у днях відносно [referenceDate]
-int ageInDays(Expense expense) => referenceDate.difference(expense.date).inDays;

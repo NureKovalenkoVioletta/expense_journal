@@ -64,12 +64,9 @@ void main() {
 
   _printSection('Сортування');
   print('Найбільші за сумою:');
-  sortByAmount(
-    expenses,
-    descending: true,
-  ).take(_previewCount).map(formatExpense).forEach(print);
+  sortByAmount(expenses, descending: true).take(_previewCount).forEach(print);
   print('Найраніші за датою:');
-  sortByDate(expenses).take(_previewCount).map(formatExpense).forEach(print);
+  sortByDate(expenses).take(_previewCount).forEach(print);
 
   _printSection('Звіт');
   print(buildReport(expenses));
@@ -91,7 +88,7 @@ void main() {
     final found = expenses.where(isInCategory(category)).firstOrNull;
     print(
       'Перший запис у категорії $category: '
-      '${found == null ? 'не знайдено' : formatExpense(found)}',
+      '${found ?? 'не знайдено'}',
     );
   }
 
@@ -105,11 +102,11 @@ void main() {
   _printSection('Вік записів');
   final byDate = sortByDate(expenses);
   print(
-    'Найстаріший: ${formatExpense(byDate.first)}, '
-    '${ageInDays(byDate.first)} дн.',
+    'Найстаріший: ${byDate.first}, '
+    '${byDate.first.ageInDays} дн.',
   );
   print(
-    'Найновіший: ${formatExpense(byDate.last)}, '
-    '${ageInDays(byDate.last)} дн.',
+    'Найновіший: ${byDate.last}, '
+    '${byDate.last.ageInDays} дн.',
   );
 }
