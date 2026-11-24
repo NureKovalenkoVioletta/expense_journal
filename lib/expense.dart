@@ -20,35 +20,25 @@ const String fieldSeparator = ';';
 const int expenseFieldCount = 6;
 
 /// Запис про одну витрату
-class Expense {
+class const Expense({
   /// Дата витрати
-  final DateTime date;
+  required final DateTime date,
 
   /// Категорія витрати
-  final String category;
+  required final String category,
 
   /// Сума у валюті [currency]
-  final double amount;
+  required final double amount,
 
   /// Код валюти
-  final String currency;
+  required final String currency,
 
   /// Спосіб оплати: `cash` або `card:` з номером картки
-  final String payment;
+  required final String payment,
 
   /// Довільна примітка
-  final String note;
-
-  /// Створює витрату з уже розібраних значень
-  const Expense({
-    required this.date,
-    required this.category,
-    required this.amount,
-    required this.currency,
-    required this.payment,
-    required this.note,
-  });
-
+  required final String note,
+}) {
   /// Створює витрату з рядка журналу [line] або кидає [FormatException], якщо рядок пошкоджений
   factory Expense.fromCsv(String line) =>
       tryParse(line) ??
