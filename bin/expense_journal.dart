@@ -110,6 +110,13 @@ void main() {
     '${identical(Expense.cached(line), Expense.cached(line))}',
   );
 
+  _printSection('Порівняння за значенням');
+  final first = Expense.fromCsv(line);
+  final second = Expense.fromCsv(line);
+  print('Однакові поля, той самий об’єкт: ${identical(first, second)}');
+  print('Однакові поля, first == second: ${first == second}');
+  print('Розмір Set з двох однакових витрат: ${{first, second}.length}');
+
   _printSection('Вік записів');
   final byDate = sortByDate(expenses);
   print(

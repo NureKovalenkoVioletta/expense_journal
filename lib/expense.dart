@@ -85,6 +85,20 @@ class const Expense({
   bool get isCardPayment => payment.startsWith(cardPrefix);
 
   @override
+  bool operator ==(Object other) =>
+      other is Expense &&
+      date == other.date &&
+      category == other.category &&
+      amount == other.amount &&
+      currency == other.currency &&
+      payment == other.payment &&
+      note == other.note;
+
+  @override
+  int get hashCode =>
+      Object.hash(date, category, amount, currency, payment, note);
+
+  @override
   String toString() =>
       '${date.toIso8601String().split('T').first} $category: '
       '${amountInUah.toStringAsFixed(amountFractionDigits)} UAH';
