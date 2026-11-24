@@ -13,6 +13,12 @@ const String cardPrefix = 'card:';
 /// Кількість знаків після коми у виведених сумах
 const int amountFractionDigits = 2;
 
+/// Роздільник полів у вхідному рядку
+const String fieldSeparator = ';';
+
+/// Кількість полів у коректному рядку
+const int expenseFieldCount = 6;
+
 /// Запис про одну витрату
 class Expense {
   /// Дата витрати
@@ -42,6 +48,36 @@ class Expense {
     required this.payment,
     required this.note,
   });
+
+  /// Створює витрату з рядка журналу [line] або кидає [FormatException], якщо рядок пошкоджений
+  factory Expense.fromCsv(String line) =>
+      tryParse(line) ??
+      (throw FormatException('Пошкоджений рядок журналу', line));
+
+  /// Повертає збережений екземпляр для рядка [line], створюючи його лише під час першого виклику
+  factory Expense.cached(String line) =>
+      _cache.putIfAbsent(line, () => Expense.fromCsv(line));
+
+  static final Map<String, Expense> _cache = {};
+
+  /// Розбирає рядок журналу [line] або повертає `null`, якщо формат некоректний
+  static Expense? tryParse(String line) {
+    final parts = line.split(fieldSeparator);
+    if (parts.length != expenseFieldCount) return null;
+
+    final date = DateTime.tryParse(parts[0]);
+    final amount = double.tryParse(parts[2]);
+    if (date == null || amount == null) return null;
+
+    return Expense(
+      date: date,
+      category: parts[1],
+      amount: amount,
+      currency: parts[3],
+      payment: parts[4],
+      note: parts[5],
+    );
+  }
 
   /// Сума витрати, перерахована в гривні
   double get amountInUah =>

@@ -18,7 +18,7 @@ void _printSection(String title) {
 }
 
 void main() {
-  final rejected = rawExpenses.where((line) => parseLine(line) == null);
+  final rejected = rawExpenses.where((line) => Expense.tryParse(line) == null);
   final parsedCount = rawExpenses.length - rejected.length;
 
   _printSection('Розбір рядків');
@@ -27,7 +27,7 @@ void main() {
   rejected.forEach(print);
 
   _printSection('Валідація записів');
-  for (final expense in rawExpenses.map(parseLine).nonNulls) {
+  for (final expense in rawExpenses.map(Expense.tryParse).nonNulls) {
     final violations = validateExpense(expense);
     if (violations.isNotEmpty) {
       print('${expense.note}: ${violations.join(', ')}');
@@ -35,7 +35,7 @@ void main() {
   }
 
   final expenses = rawExpenses
-      .map(parseLine)
+      .map(Expense.tryParse)
       .nonNulls
       .where((expense) => validateExpense(expense).isEmpty)
       .toList();
@@ -98,6 +98,17 @@ void main() {
       .toSet()
       .map((payment) => '$payment -> ${maskPayment(payment)}')
       .forEach(print);
+
+  _printSection('Конструктори');
+  final line = rawExpenses.first;
+  print(
+    'fromCsv двічі – той самий об’єкт: '
+    '${identical(Expense.fromCsv(line), Expense.fromCsv(line))}',
+  );
+  print(
+    'cached двічі – той самий об’єкт: '
+    '${identical(Expense.cached(line), Expense.cached(line))}',
+  );
 
   _printSection('Вік записів');
   final byDate = sortByDate(expenses);
