@@ -105,3 +105,11 @@ class const Expense({
       '${date.toIso8601String().split('T').first} $category: '
       '${amountInUah.toStringAsFixed(amountFractionDigits)} UAH';
 }
+
+/// Підсумкові обчислення для колекції витрат
+extension ExpenseTotals on Iterable<Expense> {
+  /// Загальна сума витрат у гривнях
+  double get totalUah =>
+      map((expense) => expense.amountInUah)
+          .fold(0, (sum, amount) => sum + amount);
+}

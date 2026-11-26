@@ -22,10 +22,8 @@ List<String> validateExpense(Expense expense) => [
 const int largeExpenseThresholdUah = 500;
 
 /// Повертає загальну суму в гривнях за витратами, оплаченими карткою
-double totalCardSpendingUah(Iterable<Expense> expenses) => expenses
-    .where((expense) => expense.isCardPayment)
-    .map((expense) => expense.amountInUah)
-    .fold(0, (sum, amount) => sum + amount);
+double totalCardSpendingUah(Iterable<Expense> expenses) =>
+    expenses.where((expense) => expense.isCardPayment).totalUah;
 
 /// Формує текстові описи витрат, сума яких не менша за поріг великої витрати
 List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
@@ -38,11 +36,10 @@ List<String> describeLargeExpenses(Iterable<Expense> expenses) => expenses
   List<Expense> expenses,
 ) {
   final amounts = expenses.map((expense) => expense.amountInUah);
-  final total = amounts.fold<double>(0, (sum, amount) => sum + amount);
   return (
     min: amounts.reduce((a, b) => a < b ? a : b),
     max: amounts.reduce((a, b) => a > b ? a : b),
-    average: total / expenses.length,
+    average: expenses.totalUah / expenses.length,
   );
 }
 
@@ -67,14 +64,7 @@ Map<String, List<Expense>> groupByPaymentKind(Iterable<Expense> expenses) =>
 
 /// Обчислює загальну суму в гривнях для кожної групи витрат [groups]
 Map<String, double> totalByGroupUah(Map<String, List<Expense>> groups) =>
-    groups.map(
-      (key, items) => MapEntry(
-        key,
-        items
-            .map((expense) => expense.amountInUah)
-            .fold(0, (sum, amount) => sum + amount),
-      ),
-    );
+    groups.map((key, items) => MapEntry(key, items.totalUah));
 
 /// Повертає копію [expenses], відсортовану за сумою в гривнях
 List<Expense> sortByAmount(
