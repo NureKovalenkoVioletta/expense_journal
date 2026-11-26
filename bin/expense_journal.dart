@@ -62,6 +62,12 @@ void main() {
         print('$category: ${total.toStringAsFixed(amountFractionDigits)} UAH'),
   );
 
+  _printSection('Витрати за видами оплати');
+  totalByGroupUah(groupByPaymentKind(expenses)).forEach(
+    (kind, total) =>
+        print('$kind: ${total.toStringAsFixed(amountFractionDigits)} UAH'),
+  );
+
   _printSection('Сортування');
   print('Найбільші за сумою:');
   sortByAmount(expenses, descending: true).take(_previewCount).forEach(print);

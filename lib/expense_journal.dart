@@ -1,4 +1,5 @@
 import 'expense.dart';
+import 'payment.dart';
 
 export 'expense.dart';
 export 'payment.dart';
@@ -51,6 +52,17 @@ Map<String, List<Expense>> groupByCategory(Iterable<Expense> expenses) =>
       {},
       (groups, expense) =>
           groups..putIfAbsent(expense.category, () => []).add(expense),
+    );
+
+/// Групує витрати [expenses] за видом оплати
+Map<String, List<Expense>> groupByPaymentKind(Iterable<Expense> expenses) =>
+    expenses.fold(
+      {},
+      (groups, expense) => groups
+        ..putIfAbsent(
+          paymentKind(expense.paymentMethod),
+          () => [],
+        ).add(expense),
     );
 
 /// Обчислює загальну суму в гривнях для кожної групи витрат [groups]

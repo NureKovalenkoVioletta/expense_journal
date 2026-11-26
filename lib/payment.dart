@@ -71,3 +71,11 @@ final class TransferPayment extends Payment {
       '${iban.substring(0, ibanCountryCodeLength)}** **** **** '
       '${iban.substring(iban.length - visibleDigits)}';
 }
+
+/// Повертає назву виду оплати для [payment]; `null` означає нерозпізнаний спосіб
+String paymentKind(Payment? payment) => switch (payment) {
+  CashPayment() => 'готівка',
+  CardPayment() => 'картка',
+  TransferPayment() => 'переказ',
+  null => 'невідомий',
+};
