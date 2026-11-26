@@ -7,6 +7,9 @@ const int visibleDigits = 4;
 /// Довжина коду країни на початку IBAN
 const int ibanCountryCodeLength = 2;
 
+/// Видима частина замаскованого номера картки перед останніми цифрами
+const String cardMaskPrefix = '**** **** **** ';
+
 /// Шаблон оплати карткою: префікс `card:` і 16 цифр номера
 final RegExp cardPaymentPattern = RegExp(r'^card:(?<number>\d{16})$');
 
@@ -36,6 +39,19 @@ sealed class Payment {
   String get masked;
 }
 
+/// Маскування номера для способів оплати, які мають номер рахунку або картки
+mixin MaskedNumber on Payment {
+  /// Повний номер, який потрібно приховати
+  String get accountNumber;
+
+  /// Видима частина замаскованого номера перед останніми цифрами
+  String get maskPrefix;
+
+  @override
+  String get masked =>
+      '$maskPrefix${accountNumber.substring(accountNumber.length - visibleDigits)}';
+}
+
 /// Оплата готівкою
 final class CashPayment extends Payment {
   /// Створює оплату готівкою
@@ -46,7 +62,7 @@ final class CashPayment extends Payment {
 }
 
 /// Оплата банківською карткою
-final class CardPayment extends Payment {
+final class CardPayment extends Payment with MaskedNumber {
   /// Номер картки
   final String number;
 
@@ -54,12 +70,14 @@ final class CardPayment extends Payment {
   const CardPayment(this.number);
 
   @override
-  String get masked =>
-      '**** **** **** ${number.substring(number.length - visibleDigits)}';
+  String get accountNumber => number;
+
+  @override
+  String get maskPrefix => cardMaskPrefix;
 }
 
 /// Оплата банківським переказом
-final class TransferPayment extends Payment {
+final class TransferPayment extends Payment with MaskedNumber {
   /// Номер рахунку отримувача у форматі IBAN
   final String iban;
 
@@ -67,9 +85,11 @@ final class TransferPayment extends Payment {
   const TransferPayment(this.iban);
 
   @override
-  String get masked =>
-      '${iban.substring(0, ibanCountryCodeLength)}** **** **** '
-      '${iban.substring(iban.length - visibleDigits)}';
+  String get accountNumber => iban;
+
+  @override
+  String get maskPrefix =>
+      '${iban.substring(0, ibanCountryCodeLength)}** **** **** ';
 }
 
 /// Повертає назву виду оплати для [payment]; `null` означає нерозпізнаний спосіб
@@ -77,5 +97,6 @@ String paymentKind(Payment? payment) => switch (payment) {
   CashPayment() => 'готівка',
   CardPayment() => 'картка',
   TransferPayment() => 'переказ',
+  MaskedNumber() => 'інший з номером',
   null => 'невідомий',
 };
