@@ -1,4 +1,5 @@
 import 'payment.dart';
+import 'repository.dart';
 
 /// Дата, відносно якої визначаються вік запису та майбутні дати
 final DateTime referenceDate = DateTime(2026, 11, 1);
@@ -37,7 +38,7 @@ class const Expense({
 
   /// Довільна примітка
   required final String note,
-}) {
+}) implements Identifiable {
   /// Створює витрату з рядка журналу [line] або кидає [FormatException], якщо рядок пошкоджений
   factory Expense.fromCsv(String line) =>
       tryParse(line) ??
@@ -100,9 +101,15 @@ class const Expense({
   int get hashCode =>
       Object.hash(date, category, amount, currency, payment, note);
 
+  /// Дата витрати у форматі РРРР-ММ-ДД
+  String get isoDate => date.toIso8601String().split('T').first;
+
+  @override
+  String get id => '$isoDate/$category';
+
   @override
   String toString() =>
-      '${date.toIso8601String().split('T').first} $category: '
+      '$isoDate $category: '
       '${amountInUah.toStringAsFixed(amountFractionDigits)} UAH';
 }
 

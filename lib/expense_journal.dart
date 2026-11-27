@@ -3,6 +3,7 @@ import 'payment.dart';
 
 export 'expense.dart';
 export 'payment.dart';
+export 'repository.dart';
 
 /// Валюти, які підтримує журнал
 const Set<String> supportedCurrencies = {'UAH', 'USD', 'EUR'};
@@ -107,7 +108,7 @@ String buildReport(
       .take(topCount)
       .map(
         (expense) => [
-          expense.date.toIso8601String().split('T').first,
+          expense.isoDate,
           expense.category,
           '${expense.amountInUah.toStringAsFixed(amountFractionDigits)} UAH',
           expense.note,

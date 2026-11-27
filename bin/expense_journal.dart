@@ -11,6 +11,8 @@ const String _pharmacyCategory = 'Аптека';
 
 const String _travelCategory = 'Подорожі';
 
+const String _missingId = '2026-12-31/Подорожі';
+
 void _printSection(String title) {
   print('');
   print(title);
@@ -125,6 +127,18 @@ void main() {
   print('Однакові поля, той самий об’єкт: ${identical(first, second)}');
   print('Однакові поля, first == second: ${first == second}');
   print('Розмір Set з двох однакових витрат: ${{first, second}.length}');
+
+  _printSection('Сховище');
+  final repository = Repository<Expense>();
+  expenses.forEach(repository.add);
+  final firstId = expenses.first.id;
+  print('Записів у сховищі: ${repository.length}');
+  print('Пошук за id $firstId: ${repository.findById(firstId)}');
+  print('Пошук за id $_missingId: ${repository.findById(_missingId)}');
+  print(
+    'Оплачено карткою: '
+    '${repository.where((expense) => expense.isCardPayment).length} записів',
+  );
 
   _printSection('Вік записів');
   final byDate = sortByDate(expenses);
