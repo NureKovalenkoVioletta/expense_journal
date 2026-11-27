@@ -50,11 +50,11 @@ void main() {
   );
   print('Великі витрати (від $largeExpenseThresholdUah UAH):');
   describeLargeExpenses(expenses).forEach(print);
-  final stats = amountStatsUah(expenses);
+  final (:min, :max, :average) = amountStatsUah(expenses);
   print(
-    'Мінімум: ${stats.min.toStringAsFixed(amountFractionDigits)} UAH, '
-    'максимум: ${stats.max.toStringAsFixed(amountFractionDigits)} UAH, '
-    'середнє: ${stats.average.toStringAsFixed(amountFractionDigits)} UAH',
+    'Мінімум: ${min.toStringAsFixed(amountFractionDigits)} UAH, '
+    'максимум: ${max.toStringAsFixed(amountFractionDigits)} UAH, '
+    'середнє: ${average.toStringAsFixed(amountFractionDigits)} UAH',
   );
 
   _printSection('Групування за категоріями');
