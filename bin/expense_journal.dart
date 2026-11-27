@@ -82,6 +82,19 @@ void main() {
     );
   }
 
+  _printSection('Класи витрат');
+  expenses
+      .fold(
+        <String, int>{},
+        (counts, expense) => counts
+          ..update(
+            expenseClass(expense),
+            (count) => count + 1,
+            ifAbsent: () => 1,
+          ),
+      )
+      .forEach((name, count) => print('$name: $count'));
+
   _printSection('Сортування');
   print('Найбільші за сумою:');
   sortByAmount(expenses, descending: true).take(_previewCount).forEach(print);

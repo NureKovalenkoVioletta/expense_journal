@@ -20,6 +20,19 @@ List<String> validateExpense(Expense expense) => [
 /// Поріг суми в гривнях, від якого витрата вважається великою
 const int largeExpenseThresholdUah = 500;
 
+/// Поріг суми в гривнях, нижче якого витрата вважається дрібною
+const int smallExpenseThresholdUah = 100;
+
+/// Визначає клас витрати [expense] за сумою в гривнях і способом оплати
+String expenseClass(Expense expense) =>
+    switch ((expense.amountInUah, expense.paymentMethod)) {
+      (final amount, _) when amount < smallExpenseThresholdUah => 'дрібна',
+      (final amount, CardPayment()) when amount >= largeExpenseThresholdUah =>
+        'велика карткою',
+      (final amount, _) when amount >= largeExpenseThresholdUah => 'велика',
+      _ => 'звичайна',
+    };
+
 /// Повертає загальну суму в гривнях за витратами, оплаченими карткою
 double totalCardSpendingUah(Iterable<Expense> expenses) =>
     expenses.where((expense) => expense.isCardPayment).totalUah;
