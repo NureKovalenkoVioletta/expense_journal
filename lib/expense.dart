@@ -1,14 +1,9 @@
+import 'currency.dart';
 import 'payment.dart';
 import 'repository.dart';
 
 /// Дата, відносно якої визначаються вік запису та майбутні дати
 final DateTime referenceDate = DateTime(2026, 11, 1);
-
-/// Курс гривні до долара США для перерахунку сум
-const double uahPerUsd = 45.05;
-
-/// Курс гривні до євро для перерахунку сум
-const double uahPerEur = 49.53;
 
 /// Кількість знаків після коми у виведених сумах
 const int amountFractionDigits = 2;
@@ -70,13 +65,10 @@ class const Expense({
   }
 
   /// Сума витрати, перерахована в гривні
-  double get amountInUah =>
-      amount *
-      switch (currency) {
-        'USD' => uahPerUsd,
-        'EUR' => uahPerEur,
-        _ => 1,
-      };
+  double get amountInUah => knownCurrency?.toUah(amount) ?? amount;
+
+  /// Валюта витрати або `null`, якщо журнал її не підтримує
+  Currency? get knownCurrency => Currency.tryParse(currency);
 
   /// Вік витрати в днях відносно [referenceDate]
   int get ageInDays => referenceDate.difference(date).inDays;

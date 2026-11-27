@@ -1,18 +1,16 @@
 import 'expense.dart';
 import 'payment.dart';
 
+export 'currency.dart';
 export 'expense.dart';
 export 'payment.dart';
 export 'repository.dart';
-
-/// Валюти, які підтримує журнал
-const Set<String> supportedCurrencies = {'UAH', 'USD', 'EUR'};
 
 /// Перевіряє значення [expense] і повертає перелік виявлених порушень
 List<String> validateExpense(Expense expense) => [
   if (expense.amount <= 0) 'сума не додатна',
   if (expense.date.isAfter(referenceDate)) 'дата в майбутньому',
-  if (!supportedCurrencies.contains(expense.currency))
+  if (expense.knownCurrency == null)
     'непідтримувана валюта ${expense.currency}',
   if (expense.category.isEmpty) 'порожня категорія',
   if (expense.paymentMethod == null)

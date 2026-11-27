@@ -70,6 +70,18 @@ void main() {
         print('$kind: ${total.toStringAsFixed(amountFractionDigits)} UAH'),
   );
 
+  _printSection('Валюти');
+  for (final currency in Currency.values) {
+    final inCurrency = expenses.where(
+      (expense) => expense.knownCurrency == currency,
+    );
+    print(
+      '${currency.code} (курс ${currency.uahRate}): '
+      '${inCurrency.length} шт., '
+      '${inCurrency.totalUah.toStringAsFixed(amountFractionDigits)} UAH',
+    );
+  }
+
   _printSection('Сортування');
   print('Найбільші за сумою:');
   sortByAmount(expenses, descending: true).take(_previewCount).forEach(print);
